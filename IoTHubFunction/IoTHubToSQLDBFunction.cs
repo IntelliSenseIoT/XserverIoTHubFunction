@@ -2,7 +2,6 @@ using IoTHubTrigger = Microsoft.Azure.WebJobs.EventHubTriggerAttribute;
 
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Azure.EventHubs;
 using System.Text;
 using System.Net.Http;
 using Microsoft.Extensions.Logging;
@@ -10,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System;
 using System.Data.SqlClient;
 using System.Data;
+using Azure.Messaging.EventHubs;
 
 /// <summary>
 /// IntelliSense AzureFunction Job for Xserver.IoT
@@ -25,7 +25,7 @@ namespace AzureFunctionApp
         public static void Run([IoTHubTrigger("messages/events", Connection = "IoTHub")] EventData message, ILogger log)
         {
 #if (DEBUG)
-            log.LogInformation($"IoT Hub trigger function processed a message: {Encoding.UTF8.GetString(message.Body.Array)}");  //Debug log
+            log.LogInformation($"IoT Hub trigger function processed a message: {Encoding.UTF8.GetString(message.EventBody.ToArray())}");  //Debug log
 #endif
 
             try
@@ -47,7 +47,7 @@ namespace AzureFunctionApp
 
                 if (MessageType != null && Namespace != null)
                 {
-                    var Message = Encoding.UTF8.GetString(message.Body.Array);
+                    var Message = Encoding.UTF8.GetString(message.EventBody.ToArray());
                     string error = null;
                     if (Message != null)
                     {
